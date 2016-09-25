@@ -138,7 +138,7 @@ bursty traffic, packet switching, possible congestion
 
 *Bandwidth*
 
-![Bandwidth Definition](./NCTU_ComputerNetworks_chapter1slide18.JPG)
+![Bandwidth Definition](./NCTU_ComputerNetworks_chapter1slide18.PNG)
 
 Unit: 
 
