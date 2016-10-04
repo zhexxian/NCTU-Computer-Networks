@@ -1,7 +1,3 @@
-# NCTU-Computer-Networks
-Notes and Assignment from the National Chiao Tung University (Taiwan) IOE5041 Computer Networks course
-
-
 
 
 0. Introduction
@@ -105,15 +101,12 @@ bursty traffic, packet switching, possible congestion
 ------------
 
  - Performance
-
  *quality of service*
 
 	Keywords: Bandwidth, offered load, throughput, latency, jitter, loss
 
  - Operations
-
  *types of mechanisms*
-
 	 - Operations at control plane **[managers]**
 
 	Routing
@@ -127,7 +120,6 @@ bursty traffic, packet switching, possible congestion
 	Quality of services
 
  - Interoperability (equipment from different vendors can operate together)
-
 *what should be put into standard protocols and what should not*
 	
 	Standard protocols and algorithms
@@ -229,3 +221,163 @@ Node error (router been working for a long time without being shutting down)
 
 >Example:
 >Dijkstra's routing algorithm may have different calculation implementation that follows the same logic 
+
+
+
+1.3 The Internet Architecture
+------------
+
+The Internet is one of the solutions that achieves the requirements (connectivity, scalability, resource sharing) and follows the principles.
+
+It defines the "design" part of the solution, while later in section 1.4 we will discuss the solution "implementation".
+
+Other common solutions: 
+
+ - Asynchronous Transfer Model (ATM)
+ - Multi-Protocol Label Switching (MPLS)
+
+
+
+
+
+
+
+Internet protocol tree (hourglass shape)
+
+
+Complexity at the edge
+
+Stateless
+
+Three level hierachy
+
+IP
+
+TCP, UDP
+
+**Solutions to Connectivity**
+
+Q: Why stateless and connectionless (routing)?
+> It requires a huge amount of memory usage for switching devices to memorize the state information. It is inefficient for bursty traffic, or short lived connection (overhead cost in establishing the connection).
+
+Q: What is the End-to-End argument?
+
+>  - Hop-to-hop error control only guarantees correctness of link, but nodes are not error-free
+>  - End-to-end error and traffic control: for end hosts, guard against nodal errors
+>  - The argument: do not put the error control in a lower layer unless it can be completely done there
+>  - Hop-to-hop control is still used for performance optimization (faster error detection)
+> The end-to-end argument has also pushed complexity toward the *network edge* while keeping the network core simple enough to scale well 
+
+Q: What is the Four-Layer Protocol Stack?
+> Abstraction -> layererd protocols -> lower layers hide details from upper layers
+> Four-layer Internet architecture (TCP/IP architecture)
+
+![Internet Protocol Stak: Commonly Used Protocols](./NCTU_ComputerNetworks_chapter1slide33.PNG)
+(The protocols marked with dotted circles are control plane protocols, while the rest are data plane protocols.)
+
+Dumb-bell shape / the evolving hourglass
+
+**Solutions to Scalability**
+
+Q: What are the fundamental design problems to be answered?
+> 1. How many levels of hierarchy
+> 2. How many entities in each hierarchy
+> 3. How to manage this hierarchy
+
+*The Internet adopts a three-level hierarchy with subnet as its lowerst lavel, autonomous system (AS) as middle level, and many ASs in the top level.*
+
+*Subnet*
+
+Definition: nodes in a physical network with a contiguous address block
+
+Keywords: subnet, netmask, prefix
+
+
+*Autonomous System (AS)* 
+
+Keywords: intra and inter AS routers
+
+Example: NCTU network
+
+
+**Solutions to Resource Sharing**
+
+Q: What are the issues on resource sharing?
+>1. Compared to telecommunications, which is primarily used for telephony only, data communications has a large variety of applications, thus require multiple types of connectivity.
+> 2. Congestion due to packet switching requires congestion control and flow control
+
+
+*Common Best-Effort Service: IP*
+
+The applications could be categorized into at least three types: interactive (response), file transfer (traffic), and real-time (both). 
+
+"Best-effort delivery" describes a network service in which the network does not provide any guarantees that data is delivered or that a user is given a guaranteed quality of service level or a certain priority.
+
+If the decision is to have a type of connectivity to support each application category, the routers inside the Internet would be type-aware so as to treat packets differently. However, the Internet offers one single type of connectivity service, namely the best-effort IP service.
+
+
+
+*End-to-End Congestion Control and Error Recovery: TCP*
+ 
+Keywords: polite, reliable
+
+UDP is another end-to-end protocol, though it is quite  primitive , with only a simple checksum for error detection, but no error recovery or traffic control.
+
+Traffic control:  UDP and TCP still can coexist, because UDP only exists in a small percentage (less than 10%), and it continues to drop (especially because streaming has been changed to TCP, as it is soft-real time, re-transmitting from TCP helps with streaming output quality); VoIP still needs UDP though as it is hard-real time.
+
+
+TCP -- AIMD (Additive increase, Multiplicative decrease):
+	analogy: driving a car, start gradually and linearly, but break quickly
+
+
+1.4 Open Source Implementation
+------------
+
+Solution Design: the Internet [Open Standard/Open Interface]
+
+Solution Implementation: many, eg open source like Linux, VxWorks, Junos, IOS [one step further: Open Source/Open Implementation]
+
+Some figures: more than 80% of the servers run on Linux
+
+**Battle between open and closed source**
+
+Q: Open Implementation or Open Interface?
+
+> Windows adopts open interface to allow third-party developers to build applications, but not Apple at that time;
+> Android (Linux+VM) not only opens interface, it opens mplementation too
+> IBM has a proprietary System Network Architecture (SNA) that is patented and prevents interoperability
+
+Virtues of open interface
+
+ - Interoperability
+
+Virtues of open implementation
+
+ - World-wide contributors
+ - Fast updates and patches
+ - Better code quality (users may debug)
+
+
+**Software Architecture in Linux Systems** 
+
+Kernel Space vs User Space
+
+Keywords: system call, software interrupt
+
+**Book Roadmap: A Packet’s Life**
+
+Aim:
+
+ - Explain the detailed why and how in each layer of the protocol stack
+ - Address the two pressing issues on the Internet: QoS and security
+
+Concept:
+
+ - sk_buff: a data structure used to store and describe a packet, so that each module can pass or access the packet simply by a memory pointer
+![sk_buff structure](./NCTU_ComputerNetworks_chapter1slide49.PNG)
+ -  alloc_skb( ): The routine called when a packet is received from a network device, to allocate a buffer for the packet
+ - skb_put( ): Move the pointer tail toward the end and the three header pointers to their corresponding positions
+ - skb_pull( ):  move down the pointer data every time when a protocol module removes its header and passes the packet to the upper-layer protocol 
+ -  kfree_skb( ):  Return the memory space of the sk_buff 
+
+Internet -- huge application -- most significantly World Wide Web, email, telnet/remote login, Finger (check if another user is online), Talk, Social Networking, and IoT
