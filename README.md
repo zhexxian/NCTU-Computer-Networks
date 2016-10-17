@@ -237,24 +237,6 @@ Other common solutions:
  - Multi-Protocol Label Switching (MPLS)
 
 
-
-
-
-
-
-Internet protocol tree (hourglass shape)
-
-
-Complexity at the edge
-
-Stateless
-
-Three level hierachy
-
-IP
-
-TCP, UDP
-
 **Solutions to Connectivity**
 
 Q: Why stateless and connectionless (routing)?
@@ -364,7 +346,7 @@ Kernel Space vs User Space
 
 Keywords: system call, software interrupt
 
-**Book Roadmap: A Packet’s Life**
+**Book Roadmap: A Packet's Life**
 
 Aim:
 
@@ -381,3 +363,44 @@ Concept:
  -  kfree_skb( ):  Return the memory space of the sk_buff 
 
 Internet -- huge application -- most significantly World Wide Web, email, telnet/remote login, Finger (check if another user is online), Talk, Social Networking, and IoT
+
+
+Bonus: Network Cloudification
+-----------------------------
+
+[Lecture slides](./Network_Cloudification.pptx)
+
+In the past, cloud computing only happened to server devices, not client devices.
+
+Enterprise used to own their own machine rooms for servers with in-house IT personnel. Now, most enterprise rent virtual machines on cloud-based servers, maintained by cloud operators.
+
+We may cloudify the control plane and some parts of the data plane, and leave only simple hardware with the enterprise.
+
+The 2nd wave of cloud computing is turning appliances to apps.
+
+Analogy: chop off your hand and surrender some of your organs to the cloud.
+
+Advantages of cloud computing:
+
+ -  cheaper device
+ - scalability
+ - job opportunity shift from IT maintenance to cloud
+(part of communication jobs will be turned into computing)
+
+The delay constraint (minimum speed required) defines if a job can be cloudified 
+
+Terms:
+
+ - Central Office Re-architected as a Datacenter (CORD)
+ - Software-Defined Networking (SDN)
+ - Network Functions Virtualization (NFV)
+
+
+Problem of having too many network functions in cloud is too many detours -- like blood detour to remote kidney, heart, and lungs -- so the aim is to detour at most once.
+
+
+
+Appendices
+----------
+
+[Lecture slides](./Appendices.ppt)
