@@ -404,3 +404,133 @@ Appendices
 ----------
 
 [Lecture slides](./Appendices.ppt)
+
+
+
+2. Physical Layer
+=================
+
+The transmission media can only carry signals instead of data, but the information source from the link layer is of digital data. Thus the physical layer must convert the digital data into an appropriate signal waveform.
+
+**2-Step Process**
+
+1. Apply information coding to the digital data for data compression and protection (not used for analog communication);
+2. Modulate the coded data into signals that are appropriate for transmission over the communication medium.
+
+Medium--channels--multiplexing (resource sharing)
+
+2.1 General Issues
+------------------
+
+**Data vs Signal: Analog vs Digital**
+
+-  Both data and signal can be either analog or digital
+-  Signal can be either periodic or aperiodic
+-  Analog: continuous, long distance and wireless transmission, more easily affected by noise
+-  Digital: disdrete, short distance and wired transmission
+-  Data: value
+-  Signal: information
+
+**Nyquist Theorem vs Shannon Theorem**
+
+- Nyquist: noiseless channel
+	- Nyquist sampling theorem: fs ? 2 x fmax
+	- Maximum data rate: 2B*log2*L (B: bandwidth, L: # states to represent a symbol)
+
+- Shannon: noisy channel
+	- Maxium data rate: B*log2*(2(1+S/N)) (B: bandwidth, S: signal, N: noise)
+
+**Transmission and Reception Flows**
+
+>Source Coding vs Channel Coding
+
+> - Source coding: compression
+> - Chennel coding: add redundancy, noise error fixing
+
+**Baseband vs Broadband**
+
+ - Baseband: digital signal transmission
+ - Broadband: analog signal transmission (digital to analog waveform conversion by **modulation**), can transmit multiple signals
+> modulation:
+> Use analog signals, characterized by amplitude, frequency, phase, or code, to represent a bit stream.
+A bit stream is modulated by  a carrier signal into a bandpass signal (with its bandwidth centered at the carrier frequency).
+
+
+**Line Coding**
+
+
+Also known as digital baseband modulation, it is a widely used coding technique for physical layer.
+
+
+ -  Synchronization: between receiver's and transmitter's clocks
+	 - loss of synchronization if long sequence of same bit value
+ -  Baseline wandering/Drift: make starting time to be the same
+	 -  hard for a decoder to determine the digital values of a received signal
+ -  DC components/DC bias: non-zero component around 0Hz due to coding techniques such as non-return-to-zero (NRZ), balance between positive and negative signal level to save power
+
+In summary, the major goals of line coding are preventing baseline wandering,  eliminating  DC components, activating self-synchronization, providing error detection and correction, and enhancing the signal’s immunity to noise and interference.  
+
+**Transmission Impairment**
+
+![Transmission Impairments](./NCTU_ComputerNetworks_chapter2slide14.PNG)
+
+
+2.2 Medium
+------------------
+
+**Wired Medium**
+
+ - Twisted Pair: prevent electromagnetic interference; telephone & Ethernet
+ -  Coaxial Cable: cable TV & Internet
+ -  Optical Fiber: straignt line or reflection, minimizing refraction
+
+**Wireless Medium**
+
+- Propogation methods: ground, sky, line-of-sight
+- Transmission waves: radio, microwave (mostly used for mobility), infrared waves
+
+2.3 Information Coding and Baseband Transmission
+------------------------------------------------
+Coding is a process that converts an information source into symbols, and vice versa for decoding.
+
+ - Source Coding: compression, application layer
+	 - e.g. JPEG, CD, DVD, MP3
+
+ - Channel Coding: error correction, physical & link layers
+
+ - Line Coding: digital data to digital signals, deals with baseline wandering & loss of synchronization & DC components
+
+**Line Coding**
+Line coding is a process that applies pulse modulation to a binary symbol, and a pulse-code modulation (PCM) waveform is generated. 
+
+ - Self-synchronization
+ - Signal to data ratio (sdr)
+ - Line coding schemes
+	 - unipolar (V, zero): DC-unbalanced, demand more power
+	 - polar (V, -V)
+	 - bipolar (V or -V, zero)
+
+![Waveforms of line coding schemes](http://images.slideplayer.com/14/4213381/slides/slide_35.jpg)
+
+
+2.3 Digital Modulation and Multiplexing
+------------------------------------------------
+
+Digital signals  ----sinusoidal carriers of higher frequency--->  analog (for transmissions over higher-frequency channels)
+
+**Amplitude-Shift Keying (ASK)**
+uses different levels of amplitude of carriers to represent digital data. 
+Binary ASK (BASK): two levels of amplitudes
+
+**Others**
+
+ - Frequency-Shift Keying (FSK) 
+ - Phase-Shift Keying (PSK)
+
+**Multiplexing**
+
+Using channel access methods, multiple transceivers can share a transmission medium. 
+
+**Code Division Multiple Access (CDMA)**
+
+Synchronous CDMA uses orthogonal codes, while asynchronous CDMA uses PN codes. 
