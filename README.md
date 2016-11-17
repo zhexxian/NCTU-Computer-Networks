@@ -368,7 +368,7 @@ Internet -- huge application -- most significantly World Wide Web, email, telnet
 Bonus: Network Cloudification
 -----------------------------
 
-[Lecture slides](./Network_Cloudification.pptx)
+[Lecture slides](Slides/Network_Cloudification.pptx)
 
 In the past, cloud computing only happened to server devices, not client devices.
 
@@ -403,7 +403,7 @@ Problem of having too many network functions in cloud is too many detours -- lik
 Appendices
 ----------
 
-[Lecture slides](./Appendices.ppt)
+[Lecture slides](Slides/Appendices.ppt)
 
 
 
