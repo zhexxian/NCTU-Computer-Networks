@@ -534,3 +534,245 @@ Using channel access methods, multiple transceivers can share a transmission med
 **Code Division Multiple Access (CDMA)**
 
 Synchronous CDMA uses orthogonal codes, while asynchronous CDMA uses PN codes. 
+
+3. Link Layer
+=================
+
+Q: Why do we need the link layer?
+ > Several issues need to be addressed by a set of functions above the physical link, such as:
+ > 
+ > - Cross-talk noise between adjacent link pairs can unexpectedly impair transmission signals and result in errors, so the link layer needs proper error control mechanisms for reliable data transmission.
+ > - The transmitter might transmit at a rate faster  than what the receiver can handle, and has to slow down if this situation happens notify the receiver where the source of the packets is.
+
+3.1 General Issues
+------------------
+
+- **Framing**: header + payload; convert between frames and bits (for physical layer transmission)
+	- bit-oriented: 01111110 in High-Level Data Link Control (HDLC)
+	- byte-oriented: SOH (start of header) and STX (start of text)
+	- bit- or byte-stuffing: DLE (data link escape)
+- **Addressing**: identify host
+	-  EEE 802 MAC Address standard
+	-  Organization-Unique Identifier (OUI) and OrganizationAssigned Portion, 3 byte each
+	-  The first bit in transmission order is reserved to indicate whether the address is unicast or multicast (eg broadcast: all 1's) 
+	- Transmission order: little-endian (least significant bit first) & big-endian (most significant bit first)
+- **Error control and reliability** 
+	-  checksum and cyclic redundancy check (CRC)
+
+	- ![Cyclic Redundancy Check](./NCTU_ComputerNetworks_chapter3slide10.PNG)
+	- Acknowledgement: silently discard [Ethernet]; positive acknowledgement [wireless]
+
+- **Flow control**: fast transmitter and slow receiver
+	- Stop-and-wait
+	- Sliding window protocol
+	- More: e.g. back pressure and PAUSE frame
+- **Medium access control (MAC)**: sharing of common physical medium; who gets to transmit next
+	- Contention-based approach
+	- Contention-free approach
+- **Bridging**: Connecting separate LANs into an interconnected network
+	-  Spanning tree protocol (STP) implemented to eliminate loops in a bridged network
+
+3.2 Point-to-Point Protocol
+---------------------------
+
+**3.2.1 High-Level Data Link Control (HDLC)**
+
+*Medium Access Control*
+
+- Normal response mode (NRM): secondary passive transmit in response to primary's poll
+-  Asynchronous response mode (ARM): secondary initiation is possible
+-  Asynchronous balanced mode (ABM): both are both primary and secondary
+
+**3.2.2 Point-to-Point Protocol**
+
+PPP vs HDLC frames
+
+**3.2.3 Internet Protocol Control Protocol (IPCP)**
+
+**3.2.4 PPP over Ethernet (PPPoE)**
+Multiple users on an Ethernet LAN access the Internet through the same broadband bridging devices, so service providers desire a method to have access control and billing on a  per-user  basis, similar to conventional dial-up services.
+
+PPPoE creates a  virtual interface  on an Ethernet interface so that each individual station on a LAN can establish a PPP session with a remote PPPoE server, which is located in the ISP and known as  Access Concentrator  ( AC ), through common bridging devices.
+
+*PPPoE Operations*
+
+ - Discovery stage: discover the MAC address of the access  concentrator
+ - PPP session stage: similar to it in normal PPP session
+
+3.3 Ethernet (IEEE 802.3)
+---------------------------
+"Carrier sense multiple access with collision detection (CSMA/CD) access method and physical layer specification."
+
+- sense if carrier is busy or bursty (not full-duplex)
+- Inter-frame gap (IFG)
+- Collision detected: jam signal, abort, back-off time (0 ~ 2^k - 1), k=min(n, 10), reattempt, max attempt and abort frame
+
+
+3.4 Wireless Links
+---------------------------
+
+Wireless vs Wired:
+>- Less reliability (interference, path loss, or multipath distortion)
+> - More mobility (wirelessness not equal to mobility)
+> - Less power availability (sleep mode, buffer data, awake)
+> - Less security (eavesdrop within the transmission range)
+
+**3.4.1 802.11 wireless LAN**
+Terms:
+
+-  Basic service set (BSS) 
+-  Distribution system (DS) 
+-  Access point (AP) 
+- Distributed coordination function (DCF)  
+- Point coordination function (PCF)
+- Carrier sense multiple access with collision avoidance (CSMA/CA)
+	- different from collision detection
+	- Collision detection in WLAN is difficult to implement: the cost of 
+ full-duplex radio frequency is high, and potentially hidden stations make collision detection fail (hidden terminal problem) 
+- Inter-frame space (IFS): 
+	- same as inter-frame gap (Ethernet collision): no random back-off
+	- analogy: freezing / cool down period of three weeks to consider if to file the divorce contract
+- Contention window (CW): backoff time   
+- Request to send (RTS) & clear to send (CTS): virtual carrier sense
+	- RTS: send a small frame asking the carrier to have a clean period, before sending the large frame;
+	- CTS: respond from receiver to let all other packages know about the collision free period reserved; so others will not send during this period;
+	-  Furthermore, the RTS/CTS mechanism is only applicable to  unicast  frames. In the case of multicast and broadcast, multiple CTSs from the receivers will result in a collision.
+
+-  Point coordinator (PC)
+	- contention-free period (CFP)
+	- polling 
+
+**3.4.2 Bluetooth (Wireless PAN)**
+
+*Master and Slaves in Piconet and Scatternet* 
+>Multiple devices sharing the same  channel  form a **piconet**, consists of exactly one master and multiple slaves;
+
+>The master has the authority to control channel access in the piconet, say, deciding the hopping sequence. The slaves can be either active or parked, and a master controls up to seven active slaves at the same time;
+
+>Parked slaves do not communicate, but they still keep  synchronized  with the master and can become active as the master demands;
+
+>For more devices to communicate simultaneously, multiple piconets can  overlap  with one another to form a larger **scatternet** with a **bridge** node
+
+*Inquiry and Paging Procedures* 
+> Inquiry: discover each other
+> Paging: build up the connection
+
+ *Interleaved Reserved and Allocated Slots* 
+Synchronous connection-oriented link (SCO link)
+ Asynchronous connectionless link (ACL link)
+
+**3.4.3 WiMAX (Wireless MAN)**
+WiMAX (Worldwide Interoperability for Microwave Access), IEEE 802.16 
+
+Developed for broadband connections over a distance of miles
+
+WiMAX uses a scheduling algorithm to allocate bandwidth among the devices,  more appropriate for time-sensitive applications such as VoIP
+
+Uplink / downlink
+
+
+
+3.5 Bridging (IEEE 802.1D)
+---------------------------
+MAC bridge, layer-2 switch
+
+Almost all bridges are transparent bridges because all stations on the interconnected LANs are unaware of their existence.
+
+The bridge has ports to which LANs are connected. Each port operates in the 
+promiscuous mode, meaning it receives every frame on the LAN attached to it, no matter what the destination address is.
+
+
+**3.5.1 Self-Learning**
+
+Address table/forwarding table, map MAC address to port number
+
+To ensure that the destination can receive the frame, it simply broadcasts the frame to every port except the port where the frame originates.
+
+*Aging* mechanism to prevent stale entries
+
+*Multicase pruning*
+
+Repeater hub, layer-1 device
+
+Cut-through (forward before completely receive frame) vs store-and-forward (new "switch")
+
+**3.5.2 Spanning Tree Protocol**
+
+Prevent loops in topology
+
+To find out the root & the direction: send "Hello", if receives "Hello" from port that has ID smaller than own ID, stop sending "Hello". At the end only one port will be sending "Hello" and that is the root. (Distributed algorithm)
+
+
+**Self-Learning Switches**
+
+Advantage:
+-  plug and play, no need much configuration
+Disadvantage:
+ - need to enforce a spanning tree with a sub-optimal path 
+ - scalability, a lot of "frothing"
+
+
+**3.5.3 Virtual LAN (IEEE 802.1Q)**
+
+3.6 Device Drivers of a Network Interface
+-----------------------------------------
+
+**Polling**
+
+*Interrupt vs polling*
+polling can suppress interrupt, and ask for more interrupt
+Analogy: interrupt is when a student raise her hand to ask a question; polling is the teacher asking "do you have any question" without waiting for an interrupt
+
+Analogy: if it is a quick question (fast interrupt), the prof can answer it right away; if it is a long question on difficult topic, the prof will request the student to book an appointment slot.
+
+*Per-frame interrupt vs per-burst interrupt*
+burst is a sequence of frames that come continuously
+
+Only interrupt-driver for the first frame, and change to polling for all subsequent frames
+
+
+4. Internet Protocol Layer
+=================
+
+Network layer
+
+IP Layer General Issues
+--------
+
+- Service: host-to-host transmission, best effort, connectionless, next-hop forwarding
+- Addressing: hierarchical address instead of flat address like Ethernet
+	- Flat address is like an ID, like selling a car and not knowing where the user will be, it is self-determined
+	- Hierarchical address is more like a real address, like selling a house and knowing its location, it is assigned
+- Routing [control plane]: compute the table
+	- Issue with IP multicast: turning router from stateless to stateful and slow it down
+	- Instead of having router doing multicast, the solution is to use a server to do multicast, and this is done in the application layer instead of internet protocol / transport layer
+- Forwarding [data plane]: look up the table
+- Security
+
+
+**Bridging vs routing**
+
+bridging: plug and play
+routing: shortest path, as no logical spanning tree is enforced; larger topology size as self learning has size restrictions (better scalability)
+
+Internet Protocol
+-----------------
+
+Classless IP address
+
+ICANN: administrator for IP address and domain name
+
+IP Forwarding
+
+Cashing and FIB table
+Analogy for longest match address: when hunt for a wife, sort possible girls by criteria and date the first in the queue, and move on to the next
+Count /  match from the highest bit first, until a match is found. This first match will be the longest match.
+
+
+**NAT**
+
+The process is can only be reached if the process talks first
+
+Why Skype user can be called by others --> because the application always do echo messaging with the server, so the server is aware of the NAT IP address and port number of the application, so the application becomes world-wide addressable
+
+NAT comes with a price: need to modify IP header checksum, TCP checksum and application-dependent modifications (e.g. FTP, ICMP)
