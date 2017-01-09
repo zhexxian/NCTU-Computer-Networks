@@ -1,5 +1,6 @@
 
 
+
 0. Introduction
 =================
 
@@ -368,7 +369,7 @@ Internet -- huge application -- most significantly World Wide Web, email, telnet
 Bonus: Network Cloudification
 -----------------------------
 
-[Lecture slides](Slides/Network_Cloudification.pptx)
+[Lecture slides](./Network_Cloudification.pptx)
 
 In the past, cloud computing only happened to server devices, not client devices.
 
@@ -403,7 +404,7 @@ Problem of having too many network functions in cloud is too many detours -- lik
 Appendices
 ----------
 
-[Lecture slides](Slides/Appendices.ppt)
+[Lecture slides](./Appendices.ppt)
 
 
 
@@ -700,8 +701,20 @@ Cut-through (forward before completely receive frame) vs store-and-forward (new 
 
 Prevent loops in topology
 
-To find out the root & the direction: send "Hello", if receives "Hello" from port that has ID smaller than own ID, stop sending "Hello". At the end only one port will be sending "Hello" and that is the root. (Distributed algorithm)
+**3.5.3 Virtual LAN (IEEE 802.1Q)**
 
+3.6 Device Drivers of a Network Interface
+-----------------------------------------
+
+Half-duplex Ethernet not efficient, long waiting time for carrier extension and frame bursting
+
+Ethernet switch
+ - Switch: physical switch; each port is a collision domain; transmission on one port will not collide with the other
+ - Hop: internal bus; collision domain = broadcast domain
+
+**Spanning Tree Protocol**
+
+To find out the root & the direction: send "Hello", if receives "Hello" from port that has ID smaller than own ID, stop sending "Hello". At the end only one port will be sending "Hello" and that is the root. (Distributed algorithm)
 
 **Self-Learning Switches**
 
@@ -712,67 +725,508 @@ Disadvantage:
  - scalability, a lot of "frothing"
 
 
-**3.5.3 Virtual LAN (IEEE 802.1Q)**
-
-3.6 Device Drivers of a Network Interface
------------------------------------------
-
-**Polling**
-
-*Interrupt vs polling*
-polling can suppress interrupt, and ask for more interrupt
-Analogy: interrupt is when a student raise her hand to ask a question; polling is the teacher asking "do you have any question" without waiting for an interrupt
+Drivers
+-------
 
 Analogy: if it is a quick question (fast interrupt), the prof can answer it right away; if it is a long question on difficult topic, the prof will request the student to book an appointment slot.
 
-*Per-frame interrupt vs per-burst interrupt*
+
+Interrupt vs polling:
+polling can suppress interrupt, and ask for more interrupt
+Analogy: interrupt is when a student raise her hand to ask a question; polling is the teacher asking "do you have any question" without waiting for an interrupt
+
+per-frame interrupt vs per-burst interrupt
 burst is a sequence of frames that come continuously
 
 Only interrupt-driver for the first frame, and change to polling for all subsequent frames
 
 
-4. Internet Protocol Layer
+4. Network Layer
 =================
-
-Network layer
+Internet Protocol Layer
 
 IP Layer General Issues
 --------
 
-- Service: host-to-host transmission, best effort, connectionless, next-hop forwarding
-- Addressing: hierarchical address instead of flat address like Ethernet
+ - Service: host-to-host transmission, best effort, connectionless, next-hop forwarding
+ - Addressing: hierarchical address instead of flat address like Ethernet
 	- Flat address is like an ID, like selling a car and not knowing where the user will be, it is self-determined
 	- Hierarchical address is more like a real address, like selling a house and knowing its location, it is assigned
-- Routing [control plane]: compute the table
+ - Routing [control plane]: compute the table
 	- Issue with IP multicast: turning router from stateless to stateful and slow it down
 	- Instead of having router doing multicast, the solution is to use a server to do multicast, and this is done in the application layer instead of internet protocol / transport layer
-- Forwarding [data plane]: look up the table
-- Security
+ - Forwarding [data plane]: look up the table
+ - Security
 
 
-**Bridging vs routing**
+**Bridging vs Routing**
+ - Bridging: plug and play 
+ - Routing: shortest path, as no logical spanning tree is enforced; larger topology size as self learning has size restrictions (better scalability)
 
-bridging: plug and play
-routing: shortest path, as no logical spanning tree is enforced; larger topology size as self learning has size restrictions (better scalability)
-
-Internet Protocol
+Data Plane Protocols
 -----------------
 
 Classless IP address
 
-ICANN: administrator for IP address and domain name
-
-IP Forwarding
+ICANN: administrator for IP address and domain name; Internet Corporation for Assigned Names and Numbers
 
 Cashing and FIB table
-Analogy for longest match address: when hunt for a wife, sort possible girls by criteria and date the first in the queue, and move on to the next
+>Analogy for longest match address: when hunt for a wife, sort possible girls by criteria and date the first in the queue, and move on to the next
 Count /  match from the highest bit first, until a match is found. This first match will be the longest match.
 
+Fragment control
 
-**NAT**
+Network Address Translation (NAT), private IP addresses
 
-The process is can only be reached if the process talks first
+IPv4 vs IPv6
 
-Why Skype user can be called by others --> because the application always do echo messaging with the server, so the server is aware of the NAT IP address and port number of the application, so the application becomes world-wide addressable
+Control Plane Protocol
+-----------------
 
-NAT comes with a price: need to modify IP header checksum, TCP checksum and application-dependent modifications (e.g. FTP, ICMP)
+**Address Management**
+Address Resolution Protocol (ARP), Reverse ARP (RARP)
+(MAC address, IP address) pair
+
+**Address Configuration**
+Dynamic Host Configuration Protocol (DHCP)
+Automatically assign IP address to host
+
+**Error Reporting**
+Internet Control Message Protocol (ICMP)
+Error and status of TCP/IP
+ICMPv4 vs ICMPv6
+
+**Routing**
+Intra-domain
+
+ - Routing Information Protocol (RIP)  
+ - Open Shortest Path First (OSPF)
+
+Inter-domain
+
+- Border Gateway Protocol (BGP)
+
+
+**Routing Principle**
+
+ - Link State Routing (Dijkstra Algorithm), global information
+ - Distance Vector Routing (Bellman-Ford Algorithm), local information with neighbours
+
+Hierarchical Routing
+Autonomous Systems (AS)
+
+
+**Membership Management**
+Internet Group Management Protocol ( IGMPv2)
+
+**Multicast Routing Protocols**
+
+>- IP multicast routing is a failure; it is only used within a domain
+- It is because it impose huge burden to routers, and it turns stateless routers to be stateful.
+- Solution: application to do multicast instead of routers
+
+Send one copy, being duplicated, to send to n receivers
+
+ - DVMRP (Source-based, one tree per source)
+ - PIM-SM (Core-based, only one tree)
+ - SSM  
+ - MSDP  
+ - Anycast RP
+
+
+
+5. Transport Layer
+=================
+End-to-end protocol layer
+
+>- Link layer: **node-to-node** single-hop communication channels between directly linked nodes;
+- IP layer: **host-to-host** multi-hop communication channels across the Internet;
+- Transport layer: **process-to-process** communication channels between application processes on different Internet hosts.
+
+
+The sophisticated Transmission Control Protocol (TCP) [connection oriented and stateful] and the primitive User Datagram Protocol (UDP) [impolite].
+
+
+Flow control (source--destination) vs Congestion control (source--network)
+
+
+TCP Congestion Control
+----------------------
+ A TCP sender is designed to infer network congestion by detecting loss events of data segments. After a loss event, the sender politely slows down its transmission rate to keep the data flow below the rate that would trigger loss events. This process is called  congestion control.
+
+ 1. Slow start
+ 2. Congestion avoidance
+ 3. Fast retransmit
+ 4. Retransmission timeout
+ 5. Fast recovery
+
+
+TCP Performance
+---------------
+
+**Performance Problem of Interactive TCP: Silly Window Syndrome** 
+
+When it occurs, small packets are exchanged across the connection, instead of full-sized segments, which implies more packets are sent for the same amount of data. 
+
+Header overhead cost as well.
+
+**Performance Problem of Bulk-Data Transfers** 
+
+ Bandwidth delay product (BDP) or the pipe size
+
+Filling of the piple is not effective utilization of the network 
+
+- The ACK-Compression Problem 
+- TCP Reno’s Multiple-Packet-Loss (MPL) Problem 
+
+since the receiver always responds with the same duplicate  ACK, the sender assumes at most one new loss per RTT. Thus, in such a case, the sender must spend numerous RTTs to handle all of these losses. 
+
+Results in eventual retransmission timeout
+
+
+Real-time Transport Protocol (RTP)
+----------------------------
+RTCP: the auxiliary control protocol for getting feedback on quality of data transmission and information about participants in the ongoing session
+
+Special parts in RTP header:
+
+ - timestamp
+ - sequence number
+ - Synchronization Source Identifier (SSRC)
+
+
+
+
+6. Application Layer
+=================
+**Driving force** for creating new applications: 
+
+- human-machine communication (accessing data and computing resources)
+- human-human communication (message exchange)
+- machine-machine communication (e.g. peer-to-peer(P2P) applications & IoT)
+
+
+
+Internet applications can be categorized as interactive, file transfer, or real-time,  each placing different **requirements** on latency, jitter, throughput, or loss.
+
+
+- TCP& UDP ports
+- Servers
+	 1. Iterative connectionless [Common]
+	 2. Iterative connection-oriented    
+	 3. Concurrent connectionless
+	 4. Concurrent connection-oriented [Common]
+
+- Stateful: connection, responsibility
+- Stateless: efficiency & scalability
+- Iterative: short service time
+- Concurrent: prolonged service time
+
+
+- Application layer protocols
+	- Variable message format, length, and data types (ASCII instead of binary)
+	- Stateful (FTP, SMTP) or stateless (HTTP, DNS)
+
+Domain Name System (DNS)
+------------------------
+
+Electronic Mail (e-mail)
+-------------------------------------------------
+- Mail Transfer Agent (MTA), Mail Delivery Agent (MDA), Mail Retrieval Agent (MRA)
+- FC 822—Internet Message Format 
+- Multipurpose Internet Mail Extensions (MIME) 
+
+**Internet Mail Protocols**
+
+- Simple Mail Transfer Protocol (SMTP)
+- Post Office Protocol Version 3 (POP3) 
+- Internet Message Access Protocol Version 4 (IMAP4) 
+	- Browser based instead of downloading
+
+
+
+World Wide Web (WWW)
+--------------------
+**Web Naming and Addressing**
+
+Uniform Resource Identifier (URI)
+Uniform Resource Locator (URL)
+Uniform Resource Name (URN)
+
+File Transfer Protocol (FTP)
+----------------------------
+**Active mode (server perspective)**
+Control connection is initiated by the client while the data connection is initiated by the server
+
+ **Passive Mode**
+ Both connections are initiated by the client (resolving firewall problem)
+ 
+
+Simple Network Management Protocol (SNMP)
+-----------------------------------------
+Designed for network administrators
+
+A more systematic infrastructure than ping, traceroute, or netstat 
+
+Management Information Base (MIB)
+
+**SNMP Basic Components**
+
+- Management Station
+- Agent
+- Managed Object
+- Managed Device
+- Management Protocol
+
+ Poll-Based and Trap-Based Detection 
+
+
+
+Voice Over IP (VoIP)
+--------------------
+
+Streaming
+--------------------
+Compression
+
+Real-Time Streaming Protocol (RTSP) 
+
+Audio and video synchronization
+
+Peer-to-Peer Applications (P2P)
+-------------------------------
+
+
+
+
+7. Quality of Service Control
+=================
+
+Introduction
+------------
+
+**Problem statement**
+
+No QoS in Internet currently (it is a freely competitive network with stateless core where only Best Effort is supported by IP), especially for non-TCP-friendly real time applications where TCP end-to-end congestion control is absent.
+
+- routers do fast forwarding without checking packet or destination
+- all packets inserted in same queue until overflow
+- packet sent out sequentially at maximum rate
+
+**Aim**
+
+ - low/bounded delay
+ - low loss rate
+ - low jitter
+ - particularly focused on wireless network & server QoS
+
+
+QoS Architecture
+--------------------
+
+**Integrated Services (IntServ)**
+	
+ - virtual private path 
+ - guaranteed bandwidth reservation and delay
+ - multiple per-flow router queues
+ - not scalable
+
+Service Types:
+
+ 1. Guaranteed (eg VoIP)
+ 2. Control Load (eg streaming)
+ 3. Best Effort (eg web browsing)
+
+**Differentiated Services (DiffServ)**
+
+ - per-class handling
+ - different forward behaviors according to service classes
+ - not widely deployed in the global Internet yet
+ - ingress or egress edge routers (identify and mark; police and shape) & core routers
+ - DS field in IP header
+
+PHB (per-hop behaviors) Groups:
+
+ 1. AF (Assured Forwarding)
+  traffics that are bursty but tolerant of packet loss
+ 2. EF (Expedited Forwarding)
+  traffic with a constant bit rate and high quality requirement
+ 3. Best-Effort
+
+
+**Comparing IntServ and DiffServ**
+
+DiffServ
+
+Pros: simpler; solves the difficulty of classifying and scheduling a huge number of packets in core routers (semi-stateful: only edge routers are stateful)
+
+Cons: no on-demand reservation; users have to sign a contract with the service provider; limit forwarding classes with possible aggregation; core routers do not classify
+
+
+
+
+Total Solution to QoS
+---------------------
+
+Algorithms for QoS Components
+
+**Control Plane**
+
+ - Signaling Protocol
+	 - negotiate with a router for resource reservation
+	 - Resource ReserVation Protocol (RSVP)
+	 - Common Open Policy Service (COPS)
+
+ - QoS Routing
+	 - provide expected arrival time 
+	 - select path based on distance, bandwidth, delay, and loss ratio 
+
+
+
+ - Admission Control
+	 - deployed at gateway routers
+	 - comparing required vs available resources
+	 - statistics-based and measurement-based (exponentially weighted moving-average (EWMA))
+
+
+
+**Data Plane**
+
+- Classification
+	- classify packet into a particular flow or class
+	- tradeoff between space and time: binary tree, mapping, hashing
+
+- Policing
+	- monitor the traffic
+	- mark, drop, or delay some packets
+	-  token bucket mechanism (token stream, leaky bucket)
+	- flexibility: mean rate, maximum rate, burst
+
+- Scheduling
+	- enforce resource sharing between different flows or classes
+	- a.  buffer management within a queue
+	- b. resource sharing among multiple queues
+	- algorithms -> fair queuing (worst-case delay bound)  
+		- round robin based
+			- weighted round robin (WRR)
+			- deficit round robin (DRR) -- long timescale and jitter
+		- sorted based
+			- generalized processor sharing (GPS) for virtual fluid model
+			- weighted fair queuing (WFQ),  virtual finish timestamp (VFT)
+
+**Others**
+
+- Packet Discarding
+	- Tail drop; longest queue tail drop (LQTD)
+	- Early drop, warning, avoid consecutive dropping
+
+
+
+
+
+8. Network Security
+=================
+
+Due to Internet's accessibility, security becomes a main concern
+
+Three main parts of security:
+
+8.1 Data security
+-----------------
+Cryptography
+	
+**Symmetric Key System** 
+
+ - DES (Data Encryption Standard)
+ 	 Only 56 bits, and it is possible to crack the key with brute force.
+ 
+ 
+ - 3DES (Triple-DES)
+Three times more expensive in computation
+
+
+ - AES (Advanced Encryption Standard); problem: may be hacked, hard to ensure the secrecy of common key; brute force may decode or guess the key 
+ Newer: 2001, easier software impelementation
+
+**Asymmetric Key System**
+
+RSA ((Rivest, Shamir, and Adleman), private and public key, CA to sign the public key and issue certificate, use it together with AES for efficiency
+
+
+**Authentication**
+
+- Digital Signature
+- MD5 (Message Digest algorithm 5)
+- plain text, hashing, private key encryption, compare two hash values
+
+**Application to VPNs (Virtual Private Networks)**
+
+*Link Layer*: Tunneling
+Packet encapsulation, private communication tunnel, NAS (network access server)
+>L2TP (Layer 2 Tunneling Protocol)
+>PPTP (Point-to-Point Tunneling Protocol)
+	
+*Network Layer*: IPsec (IP Security)
+
+ - Security Association (SA): establish a **unidirectional** connection of secure transfer
+
+ - Authentication Header (AH): integrity and authentication of data
+	- MD5 algorithm 
+	- Basically, compute a message and compare with the message sent from sender
+
+ - Encapsulation Security Payload (ESP): secure data transfer
+
+ - Key Management
+	 - SKIP (Simple Key management for IP)
+	 - ISAKMP/Oakley (Internet Key Exchange, IKE)
+
+*Transport Layer*
+
+- SSL (Secure Socket Layer)
+	Green symbol beside URL
+	Historical evolution: HTTP Secure (HTTPS) and Secure Shell (SSH) 
+- SET (Secure Electronic Transaction)
+	E-commerce, online payment
+	SET will not give the credit card number to the seller, so the seller cannot abuse the number
+
+
+8.2 Access security
+-------------------
+
+**Bidirectional** control (security and policy reasons) 
+
+**Firewall System**
+Rule matching
+Filter and report the content accessed
+
+- Packet filter-based firewall [fast]
+- Application gateway-based firewall [slower but more accurate]
+	- need to assemble packets
+	- need to be stateful
+	- scanning is harder than matching
+	- slow firewall may be performance bottleneck
+
+
+8.3 System security
+-------------------
+
+**Vulnerability** be exploited
+
+- Intrusion detection
+	- pros: faster, no false positives
+- Intrusion prevention
+	- pros: alert will not be dropped, miss unknown attacks, will block attacks
+
+
+**Malwares**
+Wild propagation of malicious programs
+Buffer overflow
+
+ 1. Information gathering
+		 Scanning, sniffing, social engineering
+ 2. Vulnerability exploiting
+		 Remote and local vulnerabilities, password cracking, denial of service (DoS)
+ 3. Malicious code
+		 Virus, worm, trojan, backdoor, bot
+ 4. Typical defenses
+		 Auditing, monitoring, intrusion detection and prevention, anti-spam
